@@ -7,6 +7,8 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 from sklearn.ensemble import RandomForestRegressor
 
+st.title("Crop Production Prediction")
+
 # 기온 데이터 (2001-2021)
 temperature_data = {
     'Year': [2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021],
@@ -49,9 +51,7 @@ crop_production_data = {
     'Wheat_Production': [188, 1114, 2148, 3362, 1417, 518, 1674, 2791, 5725, 1410, 3830, 10127, 4970, 5908, 6501, 10358, 8637, 6399, 3805, 5759, 8552]
 }
 
-
 # 데이터프레임 생성
-# 기상 데이터 및 농작물 생산량 데이터를 각각의 데이터프레임으로 생성합니다.
 temp_df = pd.DataFrame(temperature_data)
 rainfall_df = pd.DataFrame(rainfall_data)
 fertilizer_df = pd.DataFrame(fertilizer_data)
@@ -59,60 +59,52 @@ sunshine_df = pd.DataFrame(sunshine_data)
 humidity_df = pd.DataFrame(humidity_data)
 crop_df = pd.DataFrame(crop_production_data)
 
-
-# 여러 개의 데이터프레임을 연도(Year)를 기준으로 결합합니다
+# 데이터 결합
 merged_df = pd.merge(pd.merge(pd.merge(pd.merge(pd.merge(temp_df, rainfall_df, on='Year'), fertilizer_df, on='Year'), sunshine_df, on='Year'), humidity_df, on='Year'), crop_df, on='Year')
 
 # 결측치 처리 (필요한 경우)
-# 결측치를 각 열의 평균값으로 대체합니다
 merged_df.fillna(merged_df.mean(), inplace=True)
 
-# 예측 모델에 사용할 특성 변수(X)와 타겟 변수(y)를 분리합니다
+# 특성과 타겟 데이터 분리
 X = merged_df[['Average_Temp', 'Min_Temp', 'Max_Temp', 'Rainfall', 'Total_Fertilizer_Usage', 'Fertilizer_Usage_per_ha', 'Sunshine_Duration', 'Sunshine_Rate', 'Average_Humidity', 'Min_Humidity']]
 y_naked_barley = merged_df['Naked_Barley_Production']
 y_rice_barley = merged_df['Rice_Barley_Production']
 y_wheat = merged_df['Wheat_Production']
 
-# 특성 변수(X)에 대해 표준화 스케일링을 적용합니다
+# 데이터 스케일링
 scaler = StandardScaler()
 X_scaled = scaler.fit_transform(X)
 
-# 선형 회귀 모델을 사용하여 각 농작물의 생산량을 예측합니다
+# 선형 회귀 모델 생성
 model_naked_barley = LinearRegression().fit(X_scaled, y_naked_barley)
 model_rice_barley = LinearRegression().fit(X_scaled, y_rice_barley)
 model_wheat = LinearRegression().fit(X_scaled, y_wheat)
 
-# 랜덤 포레스트 모델을 사용하여 각 농작물의 생산량을 예측합니다
+# 랜덤 포레스트 모델 생성
 rf_model_naked_barley = RandomForestRegressor(n_estimators=100, random_state=42).fit(X, y_naked_barley)
 rf_model_rice_barley = RandomForestRegressor(n_estimators=100, random_state=42).fit(X, y_rice_barley)
 rf_model_wheat = RandomForestRegressor(n_estimators=100, random_state=42).fit(X, y_wheat)
 
-# 모델 평가
-#모델의 성능을 평가하기 위한 함수를 정의합니다
+# 모델 평가 함수
 def evaluate_model(model, X, y, model_name):
     predictions = model.predict(X)
     mse = mean_squared_error(y, predictions)
     mae = mean_absolute_error(y, predictions)
     r2 = r2_score(y, predictions)
-    print(f"{model_name} Model Evaluation:")
-    print(f"MSE: {mse}")
-    print(f"MAE: {mae}")
-    print(f"R²: {r2}")
-    print("------------------------------")
     return mse, mae, r2
-#선형회귀 모델의 성능을 평가합니다
-print("Linear Regression Model Evaluation:")
-evaluate_model(model_naked_barley, X_scaled, y_naked_barley, "Naked Barley Production (Linear Regression)")
-evaluate_model(model_rice_barley, X_scaled, y_rice_barley, "Rice Barley Production (Linear Regression)")
-evaluate_model(model_wheat, X_scaled, y_wheat, "Wheat Production (Linear Regression)")
-#랜덤 포레스트 모델의 성능을 평가합니다
-print("Random Forest Model Evaluation:")
-evaluate_model(rf_model_naked_barley, X, y_naked_barley, "Naked Barley Production (Random Forest)")
-evaluate_model(rf_model_rice_barley, X, y_rice_barley, "Rice Barley Production (Random Forest)")
-evaluate_model(rf_model_wheat, X, y_wheat, "Wheat Production (Random Forest)")
+
+# 선형 회귀 모델 평가
+mse_nb_lr, mae_nb_lr, r2_nb_lr = evaluate_model(model_naked_barley, X_scaled, y_naked_barley, "Naked Barley Production (Linear Regression)")
+mse_rb_lr, mae_rb_lr, r2_rb_lr = evaluate_model(model_rice_barley, X_scaled, y_rice_barley, "Rice Barley Production (Linear Regression)")
+mse_w_lr, mae_w_lr, r2_w_lr = evaluate_model(model_wheat, X_scaled, y_wheat, "Wheat Production (Linear Regression)")
+
+# 랜덤 포레스트 모델 평가
+mse_nb_rf, mae_nb_rf, r2_nb_rf = evaluate_model(rf_model_naked_barley, X, y_naked_barley, "Naked Barley Production (Random Forest)")
+mse_rb_rf, mae_rb_rf, r2_rb_rf = evaluate_model(rf_model_rice_barley, X, y_rice_barley, "Rice Barley Production (Random Forest)")
+mse_w_rf, mae_w_rf, r2_w_rf = evaluate_model(rf_model_wheat, X, y_wheat, "Wheat Production (Random Forest)")
 
 # 2022년도 예측 (예시 데이터 사용)
-new_weather_data = np.array([[12.0, 6.4, 18.5,966.7, 410, 255, 2166.9, 48.67, 72.3, 10.0]])  
+new_weather_data = np.array([[12.0, 6.4, 18.5, 966.7, 410, 255, 2166.9, 48.67, 72.3, 10.0]])
 new_weather_scaled = scaler.transform(new_weather_data)
 
 # 각 농작물의 예측값
@@ -120,29 +112,62 @@ naked_barley_pred = model_naked_barley.predict(new_weather_scaled)
 rice_barley_pred = model_rice_barley.predict(new_weather_scaled)
 wheat_pred = model_wheat.predict(new_weather_scaled)
 
-print("Predicted Naked Barley Production for 2022:", naked_barley_pred)
-print("Predicted Rice Barley Production for 2022:", rice_barley_pred)
-print("Predicted Wheat Production for 2022:", wheat_pred)
+# Streamlit을 통해 결과 출력
+st.header("Model Evaluation Results")
+
+st.subheader("Linear Regression Model")
+st.write("Naked Barley Production")
+st.write(f"MSE: {mse_nb_lr}")
+st.write(f"MAE: {mae_nb_lr}")
+st.write(f"R²: {r2_nb_lr}")
+st.write("---")
+st.write("Rice Barley Production")
+st.write(f"MSE: {mse_rb_lr}")
+st.write(f"MAE: {mae_rb_lr}")
+st.write(f"R²: {r2_rb_lr}")
+st.write("---")
+st.write("Wheat Production")
+st.write(f"MSE: {mse_w_lr}")
+st.write(f"MAE: {mae_w_lr}")
+st.write(f"R²: {r2_w_lr}")
+
+st.subheader("Random Forest Model")
+st.write("Naked Barley Production")
+st.write(f"MSE: {mse_nb_rf}")
+st.write(f"MAE: {mae_nb_rf}")
+st.write(f"R²: {r2_nb_rf}")
+st.write("---")
+st.write("Rice Barley Production")
+st.write(f"MSE: {mse_rb_rf}")
+st.write(f"MAE: {mae_rb_rf}")
+st.write(f"R²: {r2_rb_rf}")
+st.write("---")
+st.write("Wheat Production")
+st.write(f"MSE: {mse_w_rf}")
+st.write(f"MAE: {mae_w_rf}")
+st.write(f"R²: {r2_w_rf}")
+
+st.header("2022 Predictions")
+st.write("Predicted Naked Barley Production for 2022:", naked_barley_pred[0])
+st.write("Predicted Rice Barley Production for 2022:", rice_barley_pred[0])
+st.write("Predicted Wheat Production for 2022:", wheat_pred[0])
 
 # 그래프 그리기
-plt.figure(figsize=(12, 8))
-
-# 기존 생산량
-plt.plot(merged_df['Year'], merged_df['Naked_Barley_Production'], marker='o', label='Naked Barley Production')
-plt.plot(merged_df['Year'], merged_df['Rice_Barley_Production'], marker='o', label='Rice Barley Production')
-plt.plot(merged_df['Year'], merged_df['Wheat_Production'], marker='o', label='Wheat Production')
+fig, ax = plt.subplots(figsize=(12, 8))
+ax.plot(merged_df['Year'], merged_df['Naked_Barley_Production'], marker='o', label='Naked Barley Production')
+ax.plot(merged_df['Year'], merged_df['Rice_Barley_Production'], marker='o', label='Rice Barley Production')
+ax.plot(merged_df['Year'], merged_df['Wheat_Production'], marker='o', label='Wheat Production')
 
 # 예측 생산량 추가
-plt.plot([2022], naked_barley_pred, 'ro', label='Predicted Naked Barley Production (2022)')
-plt.plot([2022], rice_barley_pred, 'go', label='Predicted Rice Barley Production (2022)')
-plt.plot([2022], wheat_pred, 'bo', label='Predicted Wheat Production (2022)')
+ax.plot([2022], naked_barley_pred, 'ro', label='Predicted Naked Barley Production (2022)')
+ax.plot([2022], rice_barley_pred, 'go', label='Predicted Rice Barley Production (2022)')
+ax.plot([2022], wheat_pred, 'bo', label='Predicted Wheat Production (2022)')
 
-# 그래프 설정
-plt.title('Production of Various Crops from 2001 to 2022')
-plt.xlabel('Year')
-plt.ylabel('Production (M/T)')
-plt.legend()
-plt.grid(True)
+ax.set_title('Production of Various Crops from 2001 to 2022')
+ax.set_xlabel('Year')
+ax.set_ylabel('Production (M/T)')
+ax.legend()
+ax.grid(True)
 
-# 그래프 출력
-plt.show()
+# Streamlit을 통해 그래프 출력
+st.pyplot(fig)
