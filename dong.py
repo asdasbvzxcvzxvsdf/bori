@@ -109,8 +109,7 @@ evaluate_model(rf_model_rice_barley, X, y_rice_barley, "Rice Barley Production (
 evaluate_model(rf_model_wheat, X, y_wheat, "Wheat Production (Random Forest)")
 
 # 2022년도 예측 (예시 데이터 사용)
-new_weather_data = np.array([[12.5, 7.2, 18.7, 1259.2, 461, 286, 2080.1, 46.73, 76.7, 11.0]])  # 예시 데이터: 평균기온 12.5, 최저기온 7.2, 최고기온 18.7, 강수량 1259.2, 총 비료 사용량 461, ha당 비료 사용량 286, 일조시간 2080.1, 일조율 46.73, 평균 습도 76.7, 최소 습도 11.0
-new_weather_scaled = scaler.transform(new_weather_data)
+new_weather_data = np.array([[12.0, 6.4, 18.5,966.7, 410, 255, 2166.9, 48.67, 72.3, 10.0]])  
 
 # 각 농작물의 예측값
 naked_barley_pred = model_naked_barley.predict(new_weather_scaled)
