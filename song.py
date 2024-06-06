@@ -9,11 +9,11 @@ from sklearn.ensemble import RandomForestRegressor
 
 st.set_page_config(page_title="Crop Production Prediction", layout="wide")
 
-st.title("Crop Production Prediction")
+st.title("맥류 생산 예측 모델")
 
 # Sidebar for navigation
 st.sidebar.title("Navigation")
-options = st.sidebar.radio("Go to", ["Home", "Model Evaluation", "2022 Predictions"])
+options = st.sidebar.radio("Go to", ["Home", "모델성능평가", "2022 생산예측"])
 
 # Load Data
 def load_data():
@@ -121,10 +121,9 @@ rice_barley_pred = model_rice_barley.predict(new_weather_scaled)
 wheat_pred = model_wheat.predict(new_weather_scaled)
 
 if options == "Home":
-    st.header("Welcome to the Crop Production Prediction App")
-    st.write("""
-    This application uses historical weather and fertilizer usage data to predict crop production for Naked Barley, Rice Barley, and Wheat.
-    Use the navigation menu to explore the model evaluation and predictions.
+    st.header("어서오세요 맥류생산예측 모델입니다 ")
+    st.write(""" 이 웹사이트로 맥류 생산 예측 결과와 모델성능평가 를 보실수있습니다
+    .
     """)
 
 elif options == "Model Evaluation":
