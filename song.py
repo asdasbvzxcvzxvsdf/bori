@@ -121,10 +121,9 @@ rice_barley_pred = model_rice_barley.predict(new_weather_scaled)
 wheat_pred = model_wheat.predict(new_weather_scaled)
 
 if options == "Home":
-    st.header("Welcome to the Crop Production Prediction App")
+    st.header("어서오세요 맥류생산예측 모델입니다")
     st.write("""
-    This application uses historical weather and fertilizer usage data to predict crop production for Naked Barley, Rice Barley, and Wheat.
-    Use the navigation menu to explore the model evaluation and predictions.
+    이 웹페이지로 맥류생산예측과 모델성능평가를 보실수있습니다
     """)
 
 elif options == "Model Evaluation":
