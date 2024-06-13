@@ -165,6 +165,33 @@ elif options == "Model Evaluation":
         st.write(f"MAE: {mae_w_rf:.2f}")
         st.write(f"R²: {r2_w_rf:.2f}")
 
+    # Feature Importance Visualization
+    st.subheader("Random Forest Feature Importance")
+
+    importances_nb = rf_model_naked_barley.feature_importances_
+    importances_rb = rf_model_rice_barley.feature_importances_
+    importances_w = rf_model_wheat.feature_importances_
+
+    feature_importance_df = pd.DataFrame({
+        'Feature': X.columns,
+        'Naked_Barley_Importance': importances_nb,
+        'Rice_Barley_Importance': importances_rb,
+        'Wheat_Importance': importances_w
+    })
+
+    fig, ax = plt.subplots(1, 3, figsize=(20, 6))
+
+    ax[0].barh(feature_importance_df['Feature'], feature_importance_df['Naked_Barley_Importance'])
+    ax[0].set_title('Feature Importance for Naked Barley Production')
+
+    ax[1].barh(feature_importance_df['Feature'], feature_importance_df['Rice_Barley_Importance'])
+    ax[1].set_title('Feature Importance for Rice Barley Production')
+
+    ax[2].barh(feature_importance_df['Feature'], feature_importance_df['Wheat_Importance'])
+    ax[2].set_title('Feature Importance for Wheat Production')
+
+    st.pyplot(fig)
+
 elif options == "2022 Predictions":
     st.header("2022 Predictions")
     st.write("### Predicted Production for 2022")
