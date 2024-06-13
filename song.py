@@ -195,7 +195,7 @@ elif options == "Predict Future Production":
         "Wheat": rf_model_wheat.predict(future_data)
     }
 
-    if st.button("22년, 23년, 24년도 맥류 생산량 예측해보기"):
+    if st.button("22년,23년,24년 생산량 예측 해보기 "):
         st.write("### Predicted Production for 2022, 2023, and 2024 (Linear Regression)")
         st.write(f"**2022 Naked Barley Production**: {future_pred_lr['Naked Barley'][0]:.2f} M/T")
         st.write(f"**2022 Rice Barley Production**: {future_pred_lr['Rice Barley'][0]:.2f} M/T")
@@ -232,6 +232,9 @@ elif options == "Predict Future Production":
         ax[0].set_title('Production of Various Crops from 2001 to 2024 (Linear Regression)')
         ax[0].set_xlabel('Year')
         ax[0].set_ylabel('Production (M/T)')
+        ax[0].set_ylim(0, max(merged_df['Naked_Barley_Production'].max(), future_pred_lr['Naked Barley'].max(), 
+                              merged_df['Rice_Barley_Production'].max(), future_pred_lr['Rice Barley'].max(), 
+                              merged_df['Wheat_Production'].max(), future_pred_lr['Wheat'].max()) * 1.2)
         ax[0].legend()
         ax[0].grid(True)
 
@@ -245,6 +248,9 @@ elif options == "Predict Future Production":
         ax[1].set_title('Production of Various Crops from 2001 to 2024 (Random Forest)')
         ax[1].set_xlabel('Year')
         ax[1].set_ylabel('Production (M/T)')
+        ax[1].set_ylim(0, max(merged_df['Naked_Barley_Production'].max(), future_pred_rf['Naked Barley'].max(), 
+                              merged_df['Rice_Barley_Production'].max(), future_pred_rf['Rice Barley'].max(), 
+                              merged_df['Wheat_Production'].max(), future_pred_rf['Wheat'].max()) * 1.2)
         ax[1].legend()
         ax[1].grid(True)
 
