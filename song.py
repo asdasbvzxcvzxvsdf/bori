@@ -171,10 +171,11 @@ elif options == "Model Evaluation":
         st.write(f"R²: {r2_w_rf:.2f}")
 
 elif options == "Predict Future Production":
-    st.header("Predict Future Production for 2023 and 2024")
+    st.header("Predict Future Production for 2022, 2023, and 2024")
 
     # 미래 데이터를 코드에 하드코딩
     future_data = np.array([
+        [12.0, 6.4, 18.5, 966.7, 410, 255, 2166.9, 48.67, 72.3, 10.0],  # 2022 데이터 예시
         [13.1, 7.8, 19.3, 1984.4, 450, 270, 2069.1, 46.48, 74.8, 8.0],  # 2023 데이터 예시
         [14.8, 8.3, 21.7, 413.3, 460, 275, 996.7, 49.77, 71.0, 15.0]   # 2024 데이터 예시
     ])
@@ -194,23 +195,29 @@ elif options == "Predict Future Production":
         "Wheat": rf_model_wheat.predict(future_data)
     }
 
-    if st.button("Predict 2023 and 2024 Production"):
-        st.write("### Predicted Production for 2023 and 2024 (Linear Regression)")
-        st.write(f"**2023 Naked Barley Production**: {future_pred_lr['Naked Barley'][0]:.2f} M/T")
-        st.write(f"**2023 Rice Barley Production**: {future_pred_lr['Rice Barley'][0]:.2f} M/T")
-        st.write(f"**2023 Wheat Production**: {future_pred_lr['Wheat'][0]:.2f} M/T")
-        st.write(f"**2024 Naked Barley Production**: {future_pred_lr['Naked Barley'][1]:.2f} M/T")
-        st.write(f"**2024 Rice Barley Production**: {future_pred_lr['Rice Barley'][1]:.2f} M/T")
-        st.write(f"**2024 Wheat Production**: {future_pred_lr['Wheat'][1]:.2f} M/T")
+    if st.button("Predict 2022, 2023, and 2024 Production"):
+        st.write("### Predicted Production for 2022, 2023, and 2024 (Linear Regression)")
+        st.write(f"**2022 Naked Barley Production**: {future_pred_lr['Naked Barley'][0]:.2f} M/T")
+        st.write(f"**2022 Rice Barley Production**: {future_pred_lr['Rice Barley'][0]:.2f} M/T")
+        st.write(f"**2022 Wheat Production**: {future_pred_lr['Wheat'][0]:.2f} M/T")
+        st.write(f"**2023 Naked Barley Production**: {future_pred_lr['Naked Barley'][1]:.2f} M/T")
+        st.write(f"**2023 Rice Barley Production**: {future_pred_lr['Rice Barley'][1]:.2f} M/T")
+        st.write(f"**2023 Wheat Production**: {future_pred_lr['Wheat'][1]:.2f} M/T")
+        st.write(f"**2024 Naked Barley Production**: {future_pred_lr['Naked Barley'][2]:.2f} M/T")
+        st.write(f"**2024 Rice Barley Production**: {future_pred_lr['Rice Barley'][2]:.2f} M/T")
+        st.write(f"**2024 Wheat Production**: {future_pred_lr['Wheat'][2]:.2f} M/T")
 
         st.write("---")
-        st.write("### Predicted Production for 2023 and 2024 (Random Forest)")
-        st.write(f"**2023 Naked Barley Production**: {future_pred_rf['Naked Barley'][0]:.2f} M/T")
-        st.write(f"**2023 Rice Barley Production**: {future_pred_rf['Rice Barley'][0]:.2f} M/T")
-        st.write(f"**2023 Wheat Production**: {future_pred_rf['Wheat'][0]:.2f} M/T")
-        st.write(f"**2024 Naked Barley Production**: {future_pred_rf['Naked Barley'][1]:.2f} M/T")
-        st.write(f"**2024 Rice Barley Production**: {future_pred_rf['Rice Barley'][1]:.2f} M/T")
-        st.write(f"**2024 Wheat Production**: {future_pred_rf['Wheat'][1]:.2f} M/T")
+        st.write("### Predicted Production for 2022, 2023, and 2024 (Random Forest)")
+        st.write(f"**2022 Naked Barley Production**: {future_pred_rf['Naked Barley'][0]:.2f} M/T")
+        st.write(f"**2022 Rice Barley Production**: {future_pred_rf['Rice Barley'][0]:.2f} M/T")
+        st.write(f"**2022 Wheat Production**: {future_pred_rf['Wheat'][0]:.2f} M/T")
+        st.write(f"**2023 Naked Barley Production**: {future_pred_rf['Naked Barley'][1]:.2f} M/T")
+        st.write(f"**2023 Rice Barley Production**: {future_pred_rf['Rice Barley'][1]:.2f} M/T")
+        st.write(f"**2023 Wheat Production**: {future_pred_rf['Wheat'][1]:.2f} M/T")
+        st.write(f"**2024 Naked Barley Production**: {future_pred_rf['Naked Barley'][2]:.2f} M/T")
+        st.write(f"**2024 Rice Barley Production**: {future_pred_rf['Rice Barley'][2]:.2f} M/T")
+        st.write(f"**2024 Wheat Production**: {future_pred_rf['Wheat'][2]:.2f} M/T")
 
         # 그래프 그리기
         fig, ax = plt.subplots(2, 1, figsize=(12, 16))
@@ -219,9 +226,9 @@ elif options == "Predict Future Production":
         ax[0].plot(merged_df['Year'], merged_df['Naked_Barley_Production'], marker='o', label='Naked Barley Production')
         ax[0].plot(merged_df['Year'], merged_df['Rice_Barley_Production'], marker='o', label='Rice Barley Production')
         ax[0].plot(merged_df['Year'], merged_df['Wheat_Production'], marker='o', label='Wheat Production')
-        ax[0].plot([2023, 2024], future_pred_lr['Naked Barley'], 'ro-', label='Predicted Naked Barley Production (2023, 2024)')
-        ax[0].plot([2023, 2024], future_pred_lr['Rice Barley'], 'go-', label='Predicted Rice Barley Production (2023, 2024)')
-        ax[0].plot([2023, 2024], future_pred_lr['Wheat'], 'bo-', label='Predicted Wheat Production (2023, 2024)')
+        ax[0].plot([2022, 2023, 2024], future_pred_lr['Naked Barley'], 'ro-', label='Predicted Naked Barley Production (2022, 2023, 2024)')
+        ax[0].plot([2022, 2023, 2024], future_pred_lr['Rice Barley'], 'go-', label='Predicted Rice Barley Production (2022, 2023, 2024)')
+        ax[0].plot([2022, 2023, 2024], future_pred_lr['Wheat'], 'bo-', label='Predicted Wheat Production (2022, 2023, 2024)')
         ax[0].set_title('Production of Various Crops from 2001 to 2024 (Linear Regression)')
         ax[0].set_xlabel('Year')
         ax[0].set_ylabel('Production (M/T)')
@@ -232,9 +239,9 @@ elif options == "Predict Future Production":
         ax[1].plot(merged_df['Year'], merged_df['Naked_Barley_Production'], marker='o', label='Naked Barley Production')
         ax[1].plot(merged_df['Year'], merged_df['Rice_Barley_Production'], marker='o', label='Rice Barley Production')
         ax[1].plot(merged_df['Year'], merged_df['Wheat_Production'], marker='o', label='Wheat Production')
-        ax[1].plot([2023, 2024], future_pred_rf['Naked Barley'], 'ro-', label='Predicted Naked Barley Production (2023, 2024)')
-        ax[1].plot([2023, 2024], future_pred_rf['Rice Barley'], 'go-', label='Predicted Rice Barley Production (2023, 2024)')
-        ax[1].plot([2023, 2024], future_pred_rf['Wheat'], 'bo-', label='Predicted Wheat Production (2023, 2024)')
+        ax[1].plot([2022, 2023, 2024], future_pred_rf['Naked Barley'], 'ro-', label='Predicted Naked Barley Production (2022, 2023, 2024)')
+        ax[1].plot([2022, 2023, 2024], future_pred_rf['Rice Barley'], 'go-', label='Predicted Rice Barley Production (2022, 2023, 2024)')
+        ax[1].plot([2022, 2023, 2024], future_pred_rf['Wheat'], 'bo-', label='Predicted Wheat Production (2022, 2023, 2024)')
         ax[1].set_title('Production of Various Crops from 2001 to 2024 (Random Forest)')
         ax[1].set_xlabel('Year')
         ax[1].set_ylabel('Production (M/T)')
