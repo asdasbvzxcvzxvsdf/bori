@@ -13,7 +13,7 @@ st.title("맥류 생산 예측 모델")
 
 # Sidebar for navigation
 st.sidebar.title("Navigation")
-options = st.sidebar.radio("Go to", ["Home", "Model Evaluation", "2022 Predictions"])
+options = st.sidebar.radio("Go to", ["Home", "Model Evaluation", "Predict Future Production"])
 
 # Load Data
 def load_data():
@@ -170,45 +170,76 @@ elif options == "Model Evaluation":
         st.write(f"MAE: {mae_w_rf:.2f}")
         st.write(f"R²: {r2_w_rf:.2f}")
 
-elif options == "2022 Predictions":
-    st.header("2022 Predictions")
-    st.write("### Predicted Production for 2022")
-    st.write(f"**Naked Barley Production (Linear Regression)**: {naked_barley_pred_lr[0]:.2f} M/T")
-    st.write(f"**Rice Barley Production (Linear Regression)**: {rice_barley_pred_lr[0]:.2f} M/T")
-    st.write(f"**Wheat Production (Linear Regression)**: {wheat_pred_lr[0]:.2f} M/T")
-    st.write("---")
-    st.write(f"**Naked Barley Production (Random Forest)**: {naked_barley_pred_rf[0]:.2f} M/T")
-    st.write(f"**Rice Barley Production (Random Forest)**: {rice_barley_pred_rf[0]:.2f} M/T")
-    st.write(f"**Wheat Production (Random Forest)**: {wheat_pred_rf[0]:.2f} M/T")
+elif options == "Predict Future Production":
+    st.header("Predict Future Production for 2023 and 2024")
 
-    # 그래프 그리기
-    fig, ax = plt.subplots(2, 1, figsize=(12, 16))
+    # 미래 데이터를 코드에 하드코딩
+    future_data = np.array([
+        [13.1, 7.8, 19.3, 1984.4, 450, 270, 2069.1, 46.48, 74.8, 8.0],  # 2023 데이터 예시
+        [14.8, 8.3, 21.7, 413.3, 460, 275, 996.7, 49.77, 71.0, 15.0]   # 2024 데이터 예시
+    ])
+    future_data_scaled = scaler.transform(future_data)
 
-    # Linear Regression Predictions
-    ax[0].plot(merged_df['Year'], merged_df['Naked_Barley_Production'], marker='o', label='Naked Barley Production')
-    ax[0].plot(merged_df['Year'], merged_df['Rice_Barley_Production'], marker='o', label='Rice Barley Production')
-    ax[0].plot(merged_df['Year'], merged_df['Wheat_Production'], marker='o', label='Wheat Production')
-    ax[0].plot([2022], naked_barley_pred_lr, 'ro', label='Predicted Naked Barley Production (2022)')
-    ax[0].plot([2022], rice_barley_pred_lr, 'go', label='Predicted Rice Barley Production (2022)')
-    ax[0].plot([2022], wheat_pred_lr, 'bo', label='Predicted Wheat Production (2022)')
-    ax[0].set_title('Production of Various Crops from 2001 to 2022 (Linear Regression)')
-    ax[0].set_xlabel('Year')
-    ax[0].set_ylabel('Production (M/T)')
-    ax[0].legend()
-    ax[0].grid(True)
+    # 선형 회귀 모델 예측
+    future_pred_lr = {
+        "Naked Barley": model_naked_barley.predict(future_data_scaled),
+        "Rice Barley": model_rice_barley.predict(future_data_scaled),
+        "Wheat": model_wheat.predict(future_data_scaled)
+    }
 
-    # Random Forest Predictions
-    ax[1].plot(merged_df['Year'], merged_df['Naked_Barley_Production'], marker='o', label='Naked Barley Production')
-    ax[1].plot(merged_df['Year'], merged_df['Rice_Barley_Production'], marker='o', label='Rice Barley Production')
-    ax[1].plot(merged_df['Year'], merged_df['Wheat_Production'], marker='o', label='Wheat Production')
-    ax[1].plot([2022], naked_barley_pred_rf, 'ro', label='Predicted Naked Barley Production (2022)')
-    ax[1].plot([2022], rice_barley_pred_rf, 'go', label='Predicted Rice Barley Production (2022)')
-    ax[1].plot([2022], wheat_pred_rf, 'bo', label='Predicted Wheat Production (2022)')
-    ax[1].set_title('Production of Various Crops from 2001 to 2022 (Random Forest)')
-    ax[1].set_xlabel('Year')
-    ax[1].set_ylabel('Production (M/T)')
-    ax[1].legend()
-    ax[1].grid(True)
+    # 랜덤 포레스트 모델 예측
+    future_pred_rf = {
+        "Naked Barley": rf_model_naked_barley.predict(future_data),
+        "Rice Barley": rf_model_rice_barley.predict(future_data),
+        "Wheat": rf_model_wheat.predict(future_data)
+    }
 
-    # Streamlit을 통해 그래프 출력
-    st.pyplot(fig)
+    if st.button("Predict 2023 and 2024 Production"):
+        st.write("### Predicted Production for 2023 and 2024 (Linear Regression)")
+        st.write(f"**2023 Naked Barley Production**: {future_pred_lr['Naked Barley'][0]:.2f} M/T")
+        st.write(f"**2023 Rice Barley Production**: {future_pred_lr['Rice Barley'][0]:.2f} M/T")
+        st.write(f"**2023 Wheat Production**: {future_pred_lr['Wheat'][0]:.2f} M/T")
+        st.write(f"**2024 Naked Barley Production**: {future_pred_lr['Naked Barley'][1]:.2f} M/T")
+        st.write(f"**2024 Rice Barley Production**: {future_pred_lr['Rice Barley'][1]:.2f} M/T")
+        st.write(f"**2024 Wheat Production**: {future_pred_lr['Wheat'][1]:.2f} M/T")
+
+        st.write("---")
+        st.write("### Predicted Production for 2023 and 2024 (Random Forest)")
+        st.write(f"**2023 Naked Barley Production**: {future_pred_rf['Naked Barley'][0]:.2f} M/T")
+        st.write(f"**2023 Rice Barley Production**: {future_pred_rf['Rice Barley'][0]:.2f} M/T")
+        st.write(f"**2023 Wheat Production**: {future_pred_rf['Wheat'][0]:.2f} M/T")
+        st.write(f"**2024 Naked Barley Production**: {future_pred_rf['Naked Barley'][1]:.2f} M/T")
+        st.write(f"**2024 Rice Barley Production**: {future_pred_rf['Rice Barley'][1]:.2f} M/T")
+        st.write(f"**2024 Wheat Production**: {future_pred_rf['Wheat'][1]:.2f} M/T")
+
+        # 그래프 그리기
+        fig, ax = plt.subplots(2, 1, figsize=(12, 16))
+
+        # Linear Regression Predictions
+        ax[0].plot(merged_df['Year'], merged_df['Naked_Barley_Production'], marker='o', label='Naked Barley Production')
+        ax[0].plot(merged_df['Year'], merged_df['Rice_Barley_Production'], marker='o', label='Rice Barley Production')
+        ax[0].plot(merged_df['Year'], merged_df['Wheat_Production'], marker='o', label='Wheat Production')
+        ax[0].plot([2023, 2024], future_pred_lr['Naked Barley'], 'ro-', label='Predicted Naked Barley Production (2023, 2024)')
+        ax[0].plot([2023, 2024], future_pred_lr['Rice Barley'], 'go-', label='Predicted Rice Barley Production (2023, 2024)')
+        ax[0].plot([2023, 2024], future_pred_lr['Wheat'], 'bo-', label='Predicted Wheat Production (2023, 2024)')
+        ax[0].set_title('Production of Various Crops from 2001 to 2024 (Linear Regression)')
+        ax[0].set_xlabel('Year')
+        ax[0].set_ylabel('Production (M/T)')
+        ax[0].legend()
+        ax[0].grid(True)
+
+        # Random Forest Predictions
+        ax[1].plot(merged_df['Year'], merged_df['Naked_Barley_Production'], marker='o', label='Naked Barley Production')
+        ax[1].plot(merged_df['Year'], merged_df['Rice_Barley_Production'], marker='o', label='Rice Barley Production')
+        ax[1].plot(merged_df['Year'], merged_df['Wheat_Production'], marker='o', label='Wheat Production')
+        ax[1].plot([2023, 2024], future_pred_rf['Naked Barley'], 'ro-', label='Predicted Naked Barley Production (2023, 2024)')
+        ax[1].plot([2023, 2024], future_pred_rf['Rice Barley'], 'go-', label='Predicted Rice Barley Production (2023, 2024)')
+        ax[1].plot([2023, 2024], future_pred_rf['Wheat'], 'bo-', label='Predicted Wheat Production (2023, 2024)')
+        ax[1].set_title('Production of Various Crops from 2001 to 2024 (Random Forest)')
+        ax[1].set_xlabel('Year')
+        ax[1].set_ylabel('Production (M/T)')
+        ax[1].legend()
+        ax[1].grid(True)
+
+        # Streamlit을 통해 그래프 출력
+        st.pyplot(fig)
