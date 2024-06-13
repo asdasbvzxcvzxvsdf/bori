@@ -195,7 +195,7 @@ elif options == "Predict Future Production":
         "Wheat": rf_model_wheat.predict(future_data)
     }
 
-    if st.button("Predict 2022, 2023, and 2024 Production"):
+    if st.button("22년, 23년, 24년도 맥류 생산량 예측해보기"):
         st.write("### Predicted Production for 2022, 2023, and 2024 (Linear Regression)")
         st.write(f"**2022 Naked Barley Production**: {future_pred_lr['Naked Barley'][0]:.2f} M/T")
         st.write(f"**2022 Rice Barley Production**: {future_pred_lr['Rice Barley'][0]:.2f} M/T")
